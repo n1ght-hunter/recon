@@ -1,7 +1,6 @@
 use std::{collections::HashMap, str::FromStr};
 
 use futures::executor::block_on;
-use serde::{Deserialize, Serialize};
 
 use crate::{
     key_watcher::{rdev::Key, subscribe, KeyWatcher},
@@ -16,33 +15,21 @@ pub type MediaSource = String;
 
 pub type MediaHotkey = HashMap<MediaSource, HashMap<MediaAction, Vec<Key>>>;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct MediaHotkeys {
-    pub media_hot_keys: MediaHotkey,
-}
-
 pub static mut CURRENT_MEDIA: Option<MediaHotkey> = None;
 
 pub fn load_media() {
-    let file = load_file::<MediaHotkeys>("./src/persist/media_listener.json");
+    let file = load_file::<MediaHotkey>("./src/persist/media_listener.json");
     if file.is_ok() {
         let map = file.unwrap();
-        for (source, actions) in map.media_hot_keys {
+        // println!("loaded media");
+        for (source, actions) in map {
+            // println!("source {}", source);
             for (action, keys) in actions {
+                // println!("action {}", action);
                 let moved_source = source.clone();
                 let control_action = Controls::from_str(&action);
                 if control_action.is_ok() {
-                    let call_back = Box::new(move || {
-                        block_on(run_media_hotkey(
-                            Box::new(moved_source.clone()),
-                            Box::new(control_action.clone().unwrap()),
-                        ));
-                    });
-                    let _test = subscribe(KeyWatcher {
-                        call_back,
-                        keys,
-                        key: format!("{}-{}", source.clone(), action),
-                    });
+                    subscribe_media(moved_source, keys, control_action.unwrap());
                 }
             }
         }
@@ -53,14 +40,18 @@ pub fn load_media() {
 
 pub fn subscribe_media(source: String, keys: Vec<Key>, action: Controls) {
     let (move_source, action_move) = (source.clone(), action.clone());
-    let callback = Box::new(move || {
+    let call_back = Box::new(move || {
         block_on(run_media_hotkey(
             Box::new(move_source.clone()),
             Box::new(action_move.clone()),
         ));
     });
     // subscribe to the key watcher
-    let _test = subscribe(KeyWatcher::new(callback, keys.clone()));
+    let _test = subscribe(KeyWatcher {
+        call_back,
+        keys: keys.clone(),
+        key: format!("{}-{}", source.clone(), action),
+    });
     unsafe {
         // if the current media does not excist create it
         if CURRENT_MEDIA.is_none() {

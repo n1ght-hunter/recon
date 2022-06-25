@@ -275,7 +275,9 @@ async fn load() -> Option<String> {
 
 fn load_hot_keys(curret_application: String) -> Option<HashMap<MediaAction, Vec<Key>>> {
     unsafe {
+        // println!("{}", curret_application);
         let result = &CURRENT_MEDIA;
+        // println!("{:?}", result);
         if result.is_some() {
             let media = result.clone().unwrap();
             if media.get(&curret_application.clone()).is_some() {
