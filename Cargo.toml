@@ -1,0 +1,39 @@
+[package]
+edition = "2021"
+name = "recon"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+cfg-if = "1.0.0"
+futures = "0.3"
+iced = {version = "0.4", features = ["pure", "debug"]}
+iced_lazy = {version = "0.1", features = ["pure"]}
+iced_native = "0.5"
+iced_pure = "0.2"
+serde = {version = "1.0", features = ["derive"]}
+serde_json = "1.0"
+tokio = {version = "1.19.2", features = ["full"]}
+[dependencies.windows]
+features = [
+  "alloc",
+  "Data_Xml_Dom",
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_System_Threading",
+  "Win32_UI_WindowsAndMessaging",
+  "Media",
+  "Media_Devices",
+  "Foundation_Collections",
+  "Media_Control",
+]
+version = "0.37.0"
+
+[dependencies.uuid]
+features = [
+  "v4", # Lets you generate random UUIDs
+  "fast-rng", # Use a faster (but still sufficiently random) RNG
+  "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
+version = "1.1.2"
