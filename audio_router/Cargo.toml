@@ -1,31 +1,20 @@
 [package]
-edition = "2021"
-name = "recon"
+name = "audio_router"
 version = "0.1.0"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[workspace]
-members = [
-  "audio_router",
-  "process_starter",
-]
-
-
 [dependencies]
-cfg-if = "1.0.0"
-futures = "0.3"
-serde = {version = "1.0", features = ["derive"]}
-serde_json = "1.0"
-simple_logger = "4"
-tokio = {version = "1.19.2", features = ["full"]}
-image = "0.24"
+image = "0.23"
+
+[dependencies.iced_audio]
+git = "https://github.com/fengalin/iced_audio.git"
+branch = "pure-widgets"
 
 [dependencies.iced]
-version = "0.10"
+version = "0.5"
 features = ["canvas", "tokio", "debug"]
-
-
 
 [dependencies.windows]
 features = [
@@ -53,12 +42,4 @@ features = [
   "Win32_System_ProcessStatus",
   "Win32_Graphics_Gdi",
 ]
-version = "0.51"
-
-[dependencies.uuid]
-features = [
-  "v4", # Lets you generate random UUIDs
-  "fast-rng", # Use a faster (but still sufficiently random) RNG
-  "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
-]
-version = "1.1.2"
+version = "0.43"

@@ -123,6 +123,12 @@ pub enum Key {
     Kp9,
     KpDelete,
     // Function,
+    MediaPlayPause,
+    MediaStop,
+    MediaPrevious,
+    MediaNext,
+    MediaVolumeUp,
+    MediaVolumeDown,
     Unknown(u32),
 }
 

@@ -9,6 +9,7 @@ use windows::Media::Control::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Controls {
+    PlayPause,
     Pause,
     Play,
     Stop,
@@ -46,10 +47,11 @@ pub enum Status {
 pub async fn app_instance(
     source: &String,
 ) -> Result<GlobalSystemMediaTransportControlsSession, String> {
-    let session_manager = GlobalSystemMediaTransportControlsSessionManager::RequestAsync().unwrap();
-    let try_get_sessions = session_manager.await;
-    if try_get_sessions.is_ok() {
-        let sessions = try_get_sessions.unwrap().GetSessions();
+    let session_manager = GlobalSystemMediaTransportControlsSessionManager::RequestAsync()
+        .unwrap()
+        .await;
+    if session_manager.is_ok() {
+        let sessions = session_manager.unwrap().GetSessions();
         if sessions.is_ok() {
             let tested = sessions.unwrap().First().unwrap();
             for item in tested {
@@ -73,6 +75,7 @@ pub async fn application_task(
     todo: &Controls,
 ) -> bool {
     let async_task = match todo {
+        Controls::PlayPause => item.TryTogglePlayPauseAsync(),
         Controls::Pause => item.TryPauseAsync(),
         Controls::Play => item.TryPlayAsync(),
         Controls::Stop => item.TryStopAsync(),

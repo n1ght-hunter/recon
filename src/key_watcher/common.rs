@@ -1,8 +1,10 @@
+use std::ptr;
+
 use windows::Win32::{
-    Foundation::{GetLastError, HINSTANCE, LPARAM, LRESULT, WIN32_ERROR, WPARAM},
+    Foundation::{GetLastError, HINSTANCE, HWND, LPARAM, LRESULT, WIN32_ERROR, WPARAM},
     UI::WindowsAndMessaging::{
-        SetWindowsHookExA, HHOOK, KBDLLHOOKSTRUCT,
-        WH_KEYBOARD_LL, WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN,
+        GetMessageW, SetWindowsHookExA, HHOOK, KBDLLHOOKSTRUCT, WH_KEYBOARD_LL, WM_KEYDOWN,
+        WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP,
     },
 };
 
@@ -56,6 +58,11 @@ pub unsafe fn convert(param: WPARAM, lpdata: LPARAM) -> (Option<EventType>, Key)
             let key = key_from_code(code);
             (Some(EventType::KeyPress(key)), key)
         }
+        WM_SYSKEYUP => {
+            let code = get_code(lpdata);
+            let key = key_from_code(code);
+            (Some(EventType::KeyPress(key)), key)
+        }
         // WM_XBUTTONDOWN => {
         //     get_button_code(lpdata);
         //     // (
@@ -70,20 +77,24 @@ pub unsafe fn convert(param: WPARAM, lpdata: LPARAM) -> (Option<EventType>, Key)
         //     //     Test::Code(code),
         //     // )
         // }
-        _ => todo!(),
+        _ => {
+            println!("{:?}", test);
+            (None, Key::Unknown(0))
+        }
     }
 }
 
 type RawCallback = unsafe extern "system" fn(code: i32, param: WPARAM, lpdata: LPARAM) -> LRESULT;
 
-pub unsafe fn set_key_hook(callback: RawCallback) -> Result<(), WIN32_ERROR> {
+pub unsafe fn set_key_hook(callback: RawCallback) -> Result<(), windows::core::Error> {
     let hook = SetWindowsHookExA(WH_KEYBOARD_LL, Some(callback), HINSTANCE(0), 0);
     // let hook = SetWindowsHookExA(WH_MOUSE_LL, Some(callback), HINSTANCE(0), 0);
 
-    if hook.is_err() {
-        let error = GetLastError();
+    if let Err(error) = hook {
         return Err(error);
     }
     HOOK = hook.unwrap();
+    GetMessageW(ptr::null_mut(), HWND(0), 0, 0);
+    println!("test");
     Ok(())
 }

@@ -2,10 +2,11 @@ mod common;
 mod keycodes;
 pub mod rdev;
 use core::i32;
+use std::ptr::null_mut;
 use uuid::Uuid;
 use windows::Win32::{
-    Foundation::{LPARAM, LRESULT, WIN32_ERROR, WPARAM},
-    UI::WindowsAndMessaging::{CallNextHookEx, HC_ACTION},
+    Foundation::{HWND, LPARAM, LRESULT, WIN32_ERROR, WPARAM},
+    UI::WindowsAndMessaging::{CallNextHookEx, GetMessageA, GetMessageW, HC_ACTION},
 };
 
 use self::{
@@ -14,7 +15,6 @@ use self::{
 };
 
 type CallBack = Box<dyn FnMut()>;
-
 
 pub struct KeyWatcher {
     pub key: String,
@@ -35,13 +35,15 @@ impl KeyWatcher {
 pub static mut GLOBAL_CALLBACK: Vec<KeyWatcher> = Vec::new();
 pub static mut CURRENT_KEYS_PRESSED: Vec<Key> = Vec::new();
 
-
-pub fn listen() -> Result<(), WIN32_ERROR> {
+pub fn listen() -> Result<(), windows::core::Error> {
     unsafe {
-        set_key_hook(raw_callback)?;
+        println!("listner");
+        let value = set_key_hook(raw_callback);
+        print!("listner2");
+        value
     }
-    Ok(())
 }
+
 
 pub fn subscribe(watcher: KeyWatcher) -> Result<String, ()> {
     let key = watcher.key.clone();
@@ -68,28 +70,28 @@ unsafe extern "system" fn raw_callback(
     param: WPARAM,
     lpdata: LPARAM,
 ) -> LRESULT {
-    let action: i32 = HC_ACTION.try_into().unwrap();
-    if code == action {
-        let (opt, _name) = convert(param, lpdata);
-        if let Some(event_type) = opt {
-            match event_type {
-                EventType::KeyPress(key) => {
-                    if !CURRENT_KEYS_PRESSED.contains(&key) {
-                        CURRENT_KEYS_PRESSED.push(key);
-                    }
-                }
-                EventType::KeyRelease(key) => {
-                    CURRENT_KEYS_PRESSED.remove(
-                        CURRENT_KEYS_PRESSED
-                            .iter()
-                            .position(|x| *x == key)
-                            .expect("error removing key"),
-                    );
-                }
-            }
-        }
-    }
-    run_callbacks();
+    println!("callback");
+    // let action: i32 = HC_ACTION.try_into().unwrap();
+    // if code == action {
+    //     let (opt, _name) = convert(param, lpdata);
+    //     if let Some(event_type) = opt {
+    //         println!("{:?}", event_type);
+    //         match event_type {
+    //             EventType::KeyPress(key) => {
+    //                 if !CURRENT_KEYS_PRESSED.contains(&key) {
+    //                     CURRENT_KEYS_PRESSED.push(key);
+    //                 }
+    //             }
+    //             EventType::KeyRelease(key) => {
+    //                 let index = CURRENT_KEYS_PRESSED.iter().position(|x| *x == key);
+    //                 if index.is_some() {
+    //                     CURRENT_KEYS_PRESSED.remove(index.unwrap());
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    // run_callbacks();
     CallNextHookEx(HOOK, code, param, lpdata)
 }
 

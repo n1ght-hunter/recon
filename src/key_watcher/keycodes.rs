@@ -130,5 +130,12 @@ decl_keycodes! {
     Kp7, 103,
     Kp8, 104,
     Kp9, 105,
-    KpDelete, 110
+    KpDelete, 110,
+    MediaPlayPause, 179,
+    MediaStop, 178,
+    MediaPrevious, 177,
+    MediaNext, 176,
+    MediaVolumeUp, 175,
+    MediaVolumeDown, 174
 }
+
