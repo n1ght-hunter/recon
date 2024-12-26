@@ -1,39 +1,69 @@
-pub mod audio_router;
-pub mod gui;
-pub mod key_watcher;
-pub mod media_controls;
-pub mod media_listener;
-pub mod settings;
-use std::{sync::mpsc, time::Duration};
+use tracing::{info, Level};
+use tracing_subscriber::FmtSubscriber;
+mod window_capture_sub;
 
-use audio_router::audio_router;
-use futures::executor::block_on;
-// use gui::MediaControl;
-use iced::{Application, Settings};
-use key_watcher::listen;
-use media_listener::storage_control::load_media;
+use iced::{widget::image, Application, Command, Element, Settings};
 
+fn main() -> iced::Result {
+    let subscriber = FmtSubscriber::builder()
+        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
+        // will be written to stdout.
+        .with_max_level(Level::TRACE)
+        // completes the builder.
+        .finish();
 
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
 
-#[tokio::main]
-async fn main() {
-    audio_router()
-    // let (tx, rx) = mpsc::channel();
-    // let result = listen();
-    // if result.is_err() {
-    //     println!("error listening");
-    // }
-    // load_media();
-    // test();
-    // (|| {
-    //     let result = listen();
-    //     if result.is_err() 
-    //         println!("error listening");
-    //     }
-    // });
-    // for _received in rx {
-    //     print!("test");
-    // }
-    // println!("");
-    // MediaControl::run(Settings::default()).expect("error running media control");
+    Recon::run(Settings::default())
+}
+
+struct Recon {
+    image: iced::widget::image::Handle,
+}
+
+#[derive(Debug, Clone)]
+pub enum Message {
+    ButtonPressed,
+    NewFrame(iced::widget::image::Handle),
+}
+
+impl Application for Recon {
+    type Executor = iced::executor::Default;
+    type Message = Message;
+    type Theme = iced::Theme;
+    type Flags = ();
+
+    fn new(_flags: ()) -> (Recon, Command<Message>) {
+        (Recon {
+            image: iced::widget::image::Handle::from_pixels(1, 1, vec![0, 0, 0, 0]),
+        }, Command::none())
+    }
+
+    fn theme(&self) -> Self::Theme {
+        iced::Theme::Dark
+    }
+
+    fn title(&self) -> String {
+        String::from("My Iced App")
+    }
+
+    fn subscription(&self) -> iced::Subscription<Self::Message> {
+        window_capture_sub::create_window_capture_sub()
+    }
+
+    fn update(&mut self, message: Message) -> Command<Message> {
+        match message {
+            Message::ButtonPressed => {
+                println!("Button pressed!");
+            }
+            Message::NewFrame(image) => {
+                self.image = image;
+            }
+        }
+        Command::none()
+    }
+
+    fn view(&self) -> Element<Message> {
+        image(self.image.clone()).into()
+    }
 }
