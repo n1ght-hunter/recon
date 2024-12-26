@@ -3,20 +3,19 @@ edition = "2021"
 name = "recon"
 version = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [workspace]
 resolver = "2"
+members = ["crates/*"]
 
 [dependencies]
+dirs = "5.0.1"
 iced.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
-windows-capture.workspace = true
 
 
 [workspace.dependencies]
-iced = {version = "0.13.1", features = ["image", "tokio", "debug"]}
+iced = { version = "0.13.1", features = ["image", "tokio", "debug"] }
 futures = "0.3"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1.0"
