@@ -12,6 +12,7 @@ resolver = "2"
 iced.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+windows-capture.workspace = true
 
 
 [workspace.dependencies]
@@ -22,3 +23,4 @@ serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 tracing-subscriber = "0.3"
 tracing = "0.1"
+windows-capture = "1.4.2"
