@@ -6,22 +6,17 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
-members = [
-  "process_starter",
-  "window-capture",
-]
+members = ["process_starter"]
 
 
 [dependencies]
 futures = "0.3"
-serde = {version = "1.0", features = ["derive"]}
+serde = { version = "1", features = ["derive"] }
 serde_json = "1.0"
-tokio = {version = "1.19.2", features = ["full"]}
-window-capture = {path = "./window-capture"}
-image = "0.24"
-tracing-subscriber = "0.3.17"
-tracing = "0.1.37"
+tokio = { version = "1", features = ["full"] }
+tracing-subscriber = "0.3"
+tracing = "0.1"
 
 [dependencies.iced]
-version = "0.10"
+version = "0.13.1"
 features = ["image", "tokio", "debug"]
