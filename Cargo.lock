@@ -1385,11 +1385,15 @@ dependencies = [
 name = "game_capture_dll"
 version = "0.1.0"
 dependencies = [
+ "bitflags 2.6.0",
  "cc",
  "gl_generator",
  "hudhook",
+ "parking_lot 0.12.3",
  "serde_json",
+ "tracing",
  "ureq",
+ "windows 0.58.0",
 ]
 
 [[package]]
