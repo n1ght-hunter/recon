@@ -17,10 +17,7 @@ fn main() {
     let minhook_hash = get_minhook_hash();
 
     println!("cargo:rerun-if-changed={}", minhook_hash);
-    println!(
-        "cargo:rustc-link-search=native={}",
-        env::var("OUT_DIR").unwrap()
-    );
+  
 
     download_minhook_files();
 
@@ -32,6 +29,11 @@ fn main() {
     .file(mh_src_dir.join("trampoline.c"))
     .file(mh_src_dir.join(hde))
     .compile("libminhook.a");
+
+    println!(
+        "cargo:rustc-link-search=native={}",
+        env::var("OUT_DIR").unwrap()
+    );
 
     #[cfg(feature = "opengl3")]
     {
