@@ -15,7 +15,6 @@ inject = []
 
 [dependencies]
 bitflags = "2.6.0"
-hudhook = "*"
 parking_lot = "0.12.3"
 tracing.workspace = true
 
