@@ -8,7 +8,7 @@ use std::cell::OnceCell;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 
-use tracing::{error, trace};
+use tracing::{debug, error, trace};
 use windows::core::Error;
 use windows::Win32::Foundation::{HINSTANCE, HWND, LPARAM, WPARAM};
 use windows::Win32::System::Console::{
@@ -247,21 +247,23 @@ impl HudhookBuilder {
 #[no_mangle]
 /// Entry point for the DLL.
 pub unsafe extern "stdcall" fn DllMain(
-    hmodule: ::hudhook::windows::Win32::Foundation::HINSTANCE,
+    hmodule: HINSTANCE,
     reason: u32,
     _: *mut ::std::ffi::c_void,
 ) {
-    if reason == ::hudhook::windows::Win32::System::SystemServices::DLL_PROCESS_ATTACH {
-        trace!("DllMain()");
-        std::thread::spawn(move || {
-            if let Err(e) = ::hudhook::Hudhook::builder()
-                .with_hmodule(hmodule)
-                .build()
-                .apply()
-            {
+    match reason {
+        ::windows::Win32::System::SystemServices::DLL_PROCESS_ATTACH => {
+            debug!("DLL_PROCESS_ATTACH");
+            if let Err(e) = Hudhook::builder().with_hmodule(hmodule).build().apply() {
                 error!("Couldn't apply hooks: {e:?}");
                 eject();
             }
-        });
+        }
+        ::windows::Win32::System::SystemServices::DLL_PROCESS_DETACH => {
+            debug!("DLL_PROCESS_DETACH");
+        }
+        _ => {
+            debug!("DLL reason: {reason}");
+        }
     }
 }
