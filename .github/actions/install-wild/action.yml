@@ -1,0 +1,26 @@
+name: Install Wild Linker
+description: Downloads and installs the Wild linker binary
+
+inputs:
+  wild-version:
+    description: "Wild linker version"
+    required: false
+    default: "0.8.0"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Wild linker
+      if: runner.os == 'Linux'
+      run: |
+        case "$RUNNER_ARCH" in
+          X64)   target_arch="x86_64" ;;
+          ARM64) target_arch="aarch64" ;;
+          *) echo "Unsupported architecture: $RUNNER_ARCH" >&2; exit 1 ;;
+        esac
+        mkdir -p "${RUNNER_TEMP}/wild-install"
+        curl --silent -L \
+          "https://github.com/wild-linker/wild/releases/download/${{ inputs.wild-version }}/wild-linker-${{ inputs.wild-version }}-${target_arch}-unknown-linux-gnu.tar.gz" \
+          | tar -xz -C "${RUNNER_TEMP}/wild-install" --strip-components=1
+        echo "${RUNNER_TEMP}/wild-install" >> "$GITHUB_PATH"
+      shell: bash

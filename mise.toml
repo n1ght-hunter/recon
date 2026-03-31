@@ -1,0 +1,22 @@
+experimental_monorepo_root = true
+
+[monorepo]
+config_roots = ["crates/recon_db"]
+
+[tools]
+git-cliff = "latest"
+typos = "latest"
+protoc = "latest"
+"github:taiki-e/cargo-hack" = "latest"
+"github:guppy-rs/guppy" = { version = "latest", version_prefix = "cargo-hakari-" }
+"cargo:sqlx-cli" = { version = "latest", features = "sqlite" }
+
+
+[tasks.fix]
+description = "Fix lint errors"
+run = [
+    "typos -w",
+    "cargo hakari generate",
+    "cargo clippy --workspace --fix --allow-no-vcs --all-targets",
+    "cargo fmt --all",
+]

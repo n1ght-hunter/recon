@@ -1,0 +1,21 @@
+[advisories]
+ignore = [
+    # GTK3 bindings — unmaintained, but required as transitive deps
+    "RUSTSEC-2024-0412", # gdk
+    "RUSTSEC-2024-0413", # atk
+    "RUSTSEC-2024-0414", # gdkx11-sys
+    "RUSTSEC-2024-0415", # gtk
+    "RUSTSEC-2024-0416", # atk-sys
+    "RUSTSEC-2024-0417", # gdkx11
+    "RUSTSEC-2024-0418", # gdk-sys
+    "RUSTSEC-2024-0419", # gtk3-macros
+    "RUSTSEC-2024-0420", # gtk-sys
+    "RUSTSEC-2024-0429", # glib (unsound VariantStrIter, fixed in >=0.20.0)
+
+    # sqlx pulls in sqlx-mysql (and thus rsa) via macros even with only sqlite feature
+    "RUSTSEC-2023-0071", # rsa timing sidechannel — not used, transitive from sqlx-mysql
+
+    # Unmaintained transitive deps with no upgrade path
+    "RUSTSEC-2024-0370", # proc-macro-error
+    "RUSTSEC-2024-0436", # paste
+]

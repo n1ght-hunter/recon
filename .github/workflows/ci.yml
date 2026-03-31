@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+env:
+  SCCACHE_GHA_ENABLED: "true"
+  RUSTC_WRAPPER: "sccache"
+
+jobs:
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup show
+      - uses: ./.github/actions/install-wild
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Run tests
+        run: cargo test --workspace
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup show
+      - uses: ./.github/actions/install-wild
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Clippy check
+        run: cargo clippy --all-targets --workspace -- -D warnings
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup show
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+  hakari:
+    name: Workspace Hack
+    runs-on: ubuntu-latest
+    env:
+      RUSTC_WRAPPER: ""
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install mise
+        uses: jdx/mise-action@v4
+      - name: Install Rust toolchain
+        run: rustup show
+      - name: Check workspace-hack
+        run: mise exec -- cargo hakari verify
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install Rust toolchain
+        run: rustup show
+      - uses: ./.github/actions/install-wild
+      - name: Setup sccache
+        uses: mozilla-actions/sccache-action@v0.0.9
+      - name: Check documentation
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --document-private-items --workspace
+
+  typos:
+    name: Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Check spelling
+        uses: crate-ci/typos@master
