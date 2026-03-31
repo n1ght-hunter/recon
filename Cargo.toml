@@ -1,0 +1,15 @@
+[workspace]
+resolver = "3"
+members = ["crates/*"]
+
+[workspace.package]
+edition = "2024"
+license = "MPL-2.0"
+repository = "https://github.com/Night-Hunter-NF/recon"
+
+[workspace.dependencies]
+# Local crates
+recon = { path = "crates/recon" }
+
+# GUI
+iced = { version = "0.14", features = ["tokio"] }

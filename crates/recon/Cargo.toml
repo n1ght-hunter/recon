@@ -1,0 +1,11 @@
+[package]
+name = "recon"
+version = "0.1.0"
+edition.workspace = true
+description = "A Windows-native gaming companion app"
+license.workspace = true
+repository.workspace = true
+authors = ["Night_Hunter"]
+
+[dependencies]
+iced.workspace = true
