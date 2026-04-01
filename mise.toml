@@ -1,7 +1,7 @@
 experimental_monorepo_root = true
 
 [monorepo]
-config_roots = ["crates/recon_db"]
+config_roots = ["crates/recon_db", "plugins/test_plugin"]
 
 [tools]
 git-cliff = "latest"
@@ -10,6 +10,11 @@ protoc = "latest"
 "github:taiki-e/cargo-hack" = "latest"
 "github:guppy-rs/guppy" = { version = "latest", version_prefix = "cargo-hakari-" }
 "cargo:sqlx-cli" = { version = "latest", features = "sqlite" }
+[tools."github:bytecodealliance/wasm-pkg-tools"]
+version = "latest"
+bin = "wkg"
+[tools."github:bytecodealliance/wasm-pkg-tools".platforms]
+windows-x64 = { bin = "wkg.exe" }
 
 
 [tasks.fix]
@@ -17,6 +22,7 @@ description = "Fix lint errors"
 run = [
     "typos -w",
     "cargo hakari generate",
+    "cargo hakari manage-deps --yes",
     "cargo clippy --workspace --fix --allow-no-vcs --all-targets",
     "cargo fmt --all",
 ]

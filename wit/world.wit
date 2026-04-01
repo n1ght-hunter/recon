@@ -1,0 +1,5 @@
+package recon:app@0.1.0;
+
+world recon-app {
+    include iced:app/app@0.1.0;
+}

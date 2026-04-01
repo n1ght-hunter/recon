@@ -9,3 +9,5 @@ authors = ["Night_Hunter"]
 
 [dependencies]
 iced.workspace = true
+igloo.workspace = true
+tracing.workspace = true

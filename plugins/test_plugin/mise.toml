@@ -1,0 +1,5 @@
+[tasks.build]
+description = "Build the test plugin WASM binary"
+sources = ["src/**/*.rs", "Cargo.toml"]
+outputs = ["../../target/wasm32-wasip2/release/test_plugin.wasm"]
+run = "cargo build -p test_plugin --target wasm32-wasip2 --release"

@@ -1,0 +1,953 @@
+package iced:app@0.1.0;
+
+interface alignment {
+  /// The vertical [`alignment`] of some resource.
+  enum vertical {
+    /// Align top
+    top,
+    /// Vertically centered
+    center,
+    /// Align bottom
+    bottom,
+  }
+
+  /// The horizontal [`alignment`] of some resource.
+  enum horizontal {
+    /// Align left
+    left,
+    /// Horizontally centered
+    center,
+    /// Align right
+    right,
+  }
+
+  /// The alignment of some resource.
+  enum alignment {
+    /// Align start
+    start,
+    /// Vertically centered
+    center,
+    /// Align end
+    end,
+  }
+}
+
+interface length {
+  /// The strategy used to fill space in a specific dimension.
+  variant length {
+    /// Fill all the remaining space
+    fill,
+    /// Fill a portion of the remaining space relative to other elements.
+    ///
+    /// Let's say we have two elements: one with `FillPortion(2)` and one with
+    /// `FillPortion(3)`. The first will get 2 portions of the available space,
+    /// while the second one would get 3.
+    ///
+    /// `Length::Fill` is equivalent to `Length::FillPortion(1)`.
+    fill-portion(u16),
+    /// Fill the least amount of space
+    shrink,
+    /// Fill a fixed amount of space
+    fixed(f32),
+  }
+}
+
+interface markdown {
+  /// A widget that can parse and display Markdown.
+  record markdown {
+    /// The Markdown source to render.
+    content: string,
+  }
+}
+
+interface message-types {
+  type pane = u64;
+
+  type split = u64;
+
+  record size {
+    width: f32,
+    height: f32,
+  }
+
+  record rectangle {
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+  }
+
+  record picked {
+    pane: pane,
+  }
+
+  record canceled {
+    pane: pane,
+  }
+
+  enum edge {
+    top,
+    left,
+    right,
+    bottom,
+  }
+
+  variant region {
+    center,
+    edge(edge),
+  }
+
+  variant target {
+    edge(edge),
+    pane(tuple<pane, region>),
+  }
+
+  record dropped {
+    pane: pane,
+    target: target,
+  }
+
+  /// An event produced during a drag and drop interaction of a PaneGrid.
+  variant drag-event {
+    /// A Pane was picked for dragging.
+    picked(picked),
+    /// A Pane was dropped on top of another Pane.
+    dropped(dropped),
+    /// A Pane was picked and then dropped outside of other Pane boundaries.
+    canceled(canceled),
+  }
+
+  record resize-event {
+    split: split,
+    ratio: f32,
+  }
+
+  record absolute-offset {
+    x: f32,
+    y: f32,
+  }
+
+  record relative-offset {
+    x: f32,
+    y: f32,
+  }
+
+  /// The current Viewport of the Scrollable.
+  record viewport {
+    /// Returns the AbsoluteOffset of the current Viewport.
+    absolute-offset: absolute-offset,
+    /// Returns the AbsoluteOffset of the current Viewport, but with its alignment reversed.
+    /// This method can be useful to switch the alignment of a Scrollable while maintaining its scrolling position.
+    absolute-offset-reversed: absolute-offset,
+    /// Returns the RelativeOffset of the current Viewport.
+    relative-offset: relative-offset,
+    /// Returns the bounds of the current Viewport.
+    bounds: rectangle,
+    /// Returns the content bounds of the current Viewport.
+    content-bounds: rectangle,
+  }
+}
+
+interface message {
+  use message-types.{rectangle, pane, drag-event, resize-event, viewport, size};
+
+  /// resource message {
+  ///     /// clone the message
+  ///     clone: func() -> message;
+  /// }
+  type message-id = u64;
+
+  variant message {
+    empty,
+    bool-type(bool),
+    string-type(string),
+    translate-type(tuple<rectangle, rectangle>),
+    pane-type(pane),
+    drag-event(drag-event),
+    resize-event(resize-event),
+    viewport(viewport),
+    size(size),
+    f64-type(f64),
+    f32-type(f32),
+    u64-type(u64),
+  }
+
+  clone-message: func(message: message-id) -> message-id;
+}
+
+interface padding {
+  record padding {
+    /// The amount of padding on the left side.
+    left: f32,
+    /// The amount of padding on the right side.
+    right: f32,
+    /// The amount of padding on the top side.
+    top: f32,
+    /// The amount of padding on the bottom side.
+    bottom: f32,
+  }
+}
+
+interface progress-bar {
+  use length.{length};
+
+  /// A bar that displays progress.
+  record progress-bar {
+    /// Start value of the range of possible values.
+    range-start: f32,
+    /// End value of the range of possible values.
+    range-end: f32,
+    /// Current value of the [`ProgressBar`].
+    value: f32,
+    length: option<length>,
+    girth: option<length>,
+    vertical: option<bool>,
+  }
+}
+
+interface shared {
+  type pixels = f32;
+
+  /// The base element resource for UI widgets.
+  /// Note: The dummy function is required for jco componentize to generate the class.
+  /// See: https://github.com/bytecodealliance/ComponentizeJS/issues/221
+  resource element {
+    /// Dummy function to trigger class generation in jco componentize.
+    noop: func();
+  }
+
+  /// A color in the sRGB color space.
+  record color {
+    /// Red component, 0.0 - 1.0
+    r: f32,
+    /// Green component, 0.0 - 1.0
+    g: f32,
+    /// Blue component, 0.0 - 1.0
+    b: f32,
+    /// Alpha component, 0.0 - 1.0
+    a: f32,
+  }
+
+  enum content-fit {
+    contain,
+    cover,
+    fill,
+    none,
+    scale-down,
+  }
+
+  enum filter-method {
+    linear,
+    nearest,
+  }
+
+  variant rotation {
+    floating(f32),
+    solid(f32),
+  }
+}
+
+interface button {
+  use shared.{element};
+  use length.{length};
+  use padding.{padding};
+  use message.{message-id};
+
+  record button {
+    content: element,
+    width: option<length>,
+    height: option<length>,
+    padding: option<padding>,
+    on-press: option<message-id>,
+    clip: option<bool>,
+  }
+}
+
+interface column {
+  use shared.{pixels, element};
+  use length.{length};
+  use padding.{padding};
+  use alignment.{horizontal};
+
+  record column {
+    elements: list<element>,
+    spacing: option<pixels>,
+    padding: option<padding>,
+    height: option<length>,
+    width: option<length>,
+    max-width: option<pixels>,
+    align-x: option<horizontal>,
+    clip: option<bool>,
+  }
+}
+
+interface container {
+  use shared.{pixels, element};
+  use length.{length};
+  use padding.{padding};
+  use alignment.{horizontal, vertical};
+
+  record container {
+    content: element,
+    padding: option<padding>,
+    width: option<length>,
+    height: option<length>,
+    max-width: option<pixels>,
+    max-height: option<pixels>,
+    center-x: option<length>,
+    center-y: option<length>,
+    center: option<length>,
+    align-left: option<length>,
+    align-right: option<length>,
+    align-top: option<length>,
+    align-bottom: option<length>,
+    align-x: option<horizontal>,
+    align-y: option<vertical>,
+    clip: option<bool>,
+  }
+}
+
+interface float {
+  use shared.{element};
+
+  /// A translation applied to content.
+  record translation {
+    /// Horizontal offset.
+    x: f32,
+    /// Vertical offset.
+    y: f32,
+  }
+
+  /// Displays floating content on top of the application.
+  record float {
+    /// The content of the [`Float`].
+    content: element,
+    /// The optional scale to apply to the content.
+    scale: option<f32>,
+    /// The optional translation applied to the content.
+    translation: option<translation>,
+  }
+}
+
+interface grid {
+  use shared.{pixels, element};
+
+  /// A container that arranges its contents in a grid.
+  record grid {
+    /// The elements of the [`Grid`].
+    elements: list<element>,
+    /// Spacing between cells in the [`Grid`].
+    spacing: option<pixels>,
+    /// Width of the [`Grid`].
+    width: option<pixels>,
+    /// Height of the [`Grid`].
+    height: option<pixels>,
+    /// Number of columns in the [`Grid`].
+    columns: option<u64>,
+    fluid: option<pixels>,
+  }
+}
+
+interface image {
+  use shared.{rotation, content-fit, filter-method};
+  use length.{length};
+
+  /// A frame that displays an image.
+  record image {
+    /// The path to the image file.
+    handle: string,
+    width: option<length>,
+    height: option<length>,
+    expand: option<bool>,
+    content-fit: option<content-fit>,
+    filter-method: option<filter-method>,
+    rotation: option<rotation>,
+    opacity: option<f32>,
+    scale: option<f32>,
+  }
+}
+
+interface keyed {
+  use shared.{pixels, element};
+  use alignment.{alignment};
+  use padding.{padding};
+  use length.{length};
+
+  type key = u64;
+
+  /// A container that keeps the state of its children using keys.
+  record keyed-column {
+    keys: list<key>,
+    children: list<element>,
+    spacing: option<pixels>,
+    padding: option<padding>,
+    width: option<length>,
+    height: option<length>,
+    max-width: option<pixels>,
+    align-items: option<alignment>,
+  }
+}
+
+interface pane-grid {
+  use shared.{element};
+
+  /// A layout that can dynamically split its content into panes.
+  record pane-grid {
+    /// The elements to display in the grid.
+    children: list<element>,
+  }
+}
+
+interface row {
+  use shared.{pixels, element};
+  use length.{length};
+  use padding.{padding};
+  use alignment.{vertical};
+
+  record row {
+    elements: list<element>,
+    spacing: option<pixels>,
+    padding: option<padding>,
+    width: option<length>,
+    height: option<length>,
+    align-y: option<vertical>,
+    clip: option<bool>,
+    wrap: option<bool>,
+  }
+}
+
+interface rule {
+  use shared.{pixels};
+
+  /// A horizontal or vertical rule used for dividing content.
+  record rule {
+    /// Whether the rule is horizontal.
+    is-horizontal: bool,
+    /// Thickness of the rule in pixels.
+    thickness: pixels,
+  }
+}
+
+interface scrollable {
+  use shared.{pixels, element};
+  use length.{length};
+  use padding.{padding};
+  use alignment.{vertical};
+  use message.{message-id};
+
+  enum anchor {
+    start,
+    end,
+  }
+
+  record scrollbar {
+    width: option<pixels>,
+    margin: option<pixels>,
+    scroller-width: option<pixels>,
+    alignment: option<anchor>,
+    spacing: option<pixels>,
+  }
+
+  variant direction {
+    vertical(scrollbar),
+    horizontal(scrollbar),
+    both(tuple<scrollbar, scrollbar>),
+  }
+
+  record scrollable {
+    content: element,
+    width: option<length>,
+    height: option<length>,
+    on-scroll: option<message-id>,
+    direction: option<direction>,
+  }
+}
+
+interface slider {
+  use message.{message-id};
+  use shared.{pixels};
+  use length.{length};
+
+  /// A horizontal bar for selecting a value from a range of floats.
+  record slider {
+    /// Start value of the range of possible values.
+    range-start: f32,
+    /// End value of the range of possible values.
+    range-end: f32,
+    /// The current value of the [`Slider`].
+    value: f32,
+    on-change: message-id,
+    default: option<f32>,
+    /// The message produced when the [`Slider`] is released.
+    on-release: option<message-id>,
+    width: option<length>,
+    height: option<pixels>,
+    step: option<f32>,
+    shift-step: option<f32>,
+  }
+}
+
+interface space {
+  use message.{message-id};
+  use length.{length};
+
+  /// An amount of empty space.
+  record space {
+    width: option<length>,
+    height: option<length>,
+  }
+}
+
+interface svg {
+  /// A vector graphics image.
+  record svg {
+    /// Path to the SVG file.
+    path: string,
+  }
+}
+
+interface table {
+  use shared.{pixels, element};
+  use length.{length};
+
+  /// A grid-like visual representation of data distributed in columns and rows.
+  record table {
+    /// Header cells of the [`Table`].
+    columns: list<element>,
+    /// Rows of cells for the [`Table`].
+    rows: list<element>,
+    width: option<length>,
+    padding: option<pixels>,
+    padding-x: option<pixels>,
+    padding-y: option<pixels>,
+    separator: option<pixels>,
+    separator-x: option<pixels>,
+    separator-y: option<pixels>,
+  }
+}
+
+interface text {
+  use length.{length};
+  use alignment.{vertical};
+  use shared.{pixels, color};
+
+  /// The horizontal alignment of some text.
+  variant alignment {
+    /// No specific alignment.
+    ///
+    /// Left-to-right text will be aligned to the left, while
+    /// right-to-left text will be aligned to the right.
+    default,
+    /// Align text to the left.
+    left,
+    /// Center text.
+    center,
+    /// Align text to the right.
+    right,
+    /// Justify text.
+    justified,
+  }
+
+  /// The height of a line of text in a paragraph.
+  variant line-height {
+    /// A factor of the size of the text.
+    relative(f32),
+    /// An absolute height in logical pixels.
+    absolute(pixels),
+  }
+
+  /// The shaping strategy of some text.
+  enum shaping {
+    /// No shaping and no font fallback.
+    ///
+    /// This shaping strategy is very cheap, but it will not display complex
+    /// scripts properly nor try to find missing glyphs in your system fonts.
+    ///
+    /// You should use this strategy when you have complete control of the text
+    /// and the font you are displaying in your application.
+    basic,
+    /// Advanced text shaping and font fallback.
+    ///
+    /// You will need to enable this flag if the text contains a complex
+    /// script, the font used needs it, and/or multiple fonts in your system
+    /// may be needed to display all of the glyphs.
+    ///
+    /// Advanced shaping is expensive! You should only enable it when necessary.
+    advanced,
+    /// Automatically detect the shaping strategy based on the text contents.
+    ///
+    /// This is the default.
+    auto,
+  }
+
+  /// The wrapping strategy of some text.
+  enum wrapping {
+    /// No wrapping.
+    none,
+    /// Wraps at the word level.
+    ///
+    /// This is the default.
+    word,
+    /// Wraps at the glyph level.
+    glyph,
+    /// Wraps at the word level, or fallback to glyph level if a word can't fit on a line by itself.
+    word-or-glyph,
+  }
+
+  record text {
+    text: string,
+    size: option<f32>,
+    line-height: option<line-height>,
+    width: option<length>,
+    height: option<length>,
+    center: option<bool>,
+    align-x: option<alignment>,
+    align-y: option<vertical>,
+    shaping: option<shaping>,
+    wrapping: option<wrapping>,
+    color: option<color>,
+  }
+}
+
+interface checkbox {
+  use shared.{pixels};
+  use message.{message-id};
+  use text.{line-height, shaping, wrapping};
+  use length.{length};
+
+  /// A box that can be checked.
+  record checkbox {
+    /// Whether the [`Checkbox`] is currently checked.
+    is-checked: bool,
+    /// The label of the [`Checkbox`].
+    label: option<string>,
+    /// The message produced when the [`Checkbox`] is toggled.
+    on-toggle: option<message-id>,
+    size: option<pixels>,
+    width: option<length>,
+    height: option<length>,
+    spacing: option<pixels>,
+    text-size: option<pixels>,
+    text-line-height: option<line-height>,
+    text-wrapping: option<wrapping>,
+    text-shaping: option<shaping>,
+  }
+}
+
+interface combo-box {
+  use message.{message-id};
+  use text.{line-height};
+  use length.{length};
+  use padding.{padding};
+
+  /// A widget allowing selection from a list of options.
+  record combo-box {
+    /// The options displayed in the [`ComboBox`].
+    options: list<string>,
+    /// The placeholder to display when no option is selected.
+    placeholder: string,
+    /// The index of the currently selected option.
+    selected: option<string>,
+    /// The message produced when an option is selected.
+    on-selected: message-id,
+    on-input: option<message-id>,
+    on-option-hovered: option<message-id>,
+    on-open: option<message-id>,
+    on-close: option<message-id>,
+    padding: option<padding>,
+    size: option<f32>,
+    line-height: option<line-height>,
+    width: option<length>,
+  }
+}
+
+interface pick-list {
+  use message.{message-id};
+  use shared.{pixels};
+  use length.{length};
+  use text.{line-height, shaping};
+  use padding.{padding};
+
+  /// A widget for selecting a value from a set of options.
+  record pick-list {
+    /// The options displayed in the [`PickList`].
+    options: list<string>,
+    /// The index of the currently selected option.
+    selected: option<string>,
+    on-select: message-id,
+    /// The placeholder to display when no option is selected.
+    placeholder: option<string>,
+    width: option<length>,
+    padding: option<padding>,
+    text-size: option<pixels>,
+    text-line-height: option<line-height>,
+    text-shaping: option<shaping>,
+    /// The message produced when the [`PickList`] is opened.
+    on-open: option<message-id>,
+    /// The message produced when the [`PickList`] is closed.
+    on-close: option<message-id>,
+  }
+}
+
+interface radio {
+  use shared.{pixels};
+  use length.{length};
+  use text.{line-height, shaping, wrapping};
+  use message.{message-id};
+
+  /// A circular button representing an alternative.
+  record radio {
+    /// The label of the radio.
+    label: string,
+    /// Whether the radio is currently selected.
+    is-selected: bool,
+    /// The message produced when the radio is selected.
+    on-select: message-id,
+    /// Sets the size of the radio button
+    size: option<pixels>,
+    /// sets the width of the radio button
+    width: option<length>,
+    /// Sets the spacing between the Radio button and the text.
+    spacing: option<pixels>,
+    /// Sets the text size of the Radio button.
+    text-size: option<pixels>,
+    /// Sets the text line height of the Radio button.
+    text-line-height: option<line-height>,
+    /// Sets the text wrapping of the Radio button.
+    text-wrapping: option<wrapping>,
+    /// Sets the text shaping of the Radio button.
+    text-shaping: option<shaping>,
+  }
+}
+
+interface text-input {
+  use message.{message-id};
+  use shared.{pixels};
+  use padding.{padding};
+  use text.{line-height};
+  use alignment.{horizontal};
+  use length.{length};
+
+  /// A field that can be filled with text.
+  record text-input {
+    /// The placeholder text of the [`TextInput`].
+    placeholder: string,
+    /// The current value of the [`TextInput`].
+    value: string,
+    /// Whether the [`TextInput`] is secure (e.g. password field).
+    secure: option<bool>,
+    /// The message produced when the [`TextInput`] changes.
+    on-input: option<message-id>,
+    /// The message produced when the [`TextInput`] is submitted.
+    on-submit: option<message-id>,
+    on-paste: option<message-id>,
+    width: option<length>,
+    padding: option<padding>,
+    size: option<pixels>,
+    line-height: option<line-height>,
+    align-x: option<horizontal>,
+  }
+}
+
+interface toggler {
+  use shared.{pixels};
+  use message.{message-id};
+  use padding.{padding};
+  use text.{line-height, shaping, wrapping};
+  use alignment.{horizontal};
+  use length.{length};
+
+  /// A widget representing a setting that can be toggled on or off.
+  record toggler {
+    /// Whether the [`Toggler`] is currently toggled.
+    is-toggled: bool,
+    /// The optional label of the [`Toggler`].
+    label: option<string>,
+    /// The message produced when the [`Toggler`] is toggled.
+    on-toggle: option<message-id>,
+    size: option<pixels>,
+    width: option<length>,
+    text-size: option<pixels>,
+    text-line-height: option<line-height>,
+    text-alignment: option<horizontal>,
+    text-shaping: option<shaping>,
+    text-wrapping: option<wrapping>,
+    spacing: option<pixels>,
+  }
+}
+
+interface tooltip {
+  use shared.{pixels, element};
+
+  enum position {
+    top,
+    bottom,
+    left,
+    right,
+    follow-cursor,
+  }
+
+  record tooltip {
+    content: element,
+    tooltip: element,
+    position: position,
+    gap: option<pixels>,
+    padding: option<pixels>,
+    snap-within-viewport: option<bool>,
+  }
+}
+
+interface vertical-slider {
+  use message.{message-id};
+  use shared.{pixels};
+  use length.{length};
+
+  /// A vertical bar for selecting a value from a range of floats.
+  record vertical-slider {
+    /// Start value of the range of possible values.
+    range-start: f32,
+    /// End value of the range of possible values.
+    range-end: f32,
+    /// The current value of the [`VerticalSlider`].
+    value: f32,
+    /// The message produced when the [`VerticalSlider`] is dragged.
+    on-change: message-id,
+    /// The default value of the [`VerticalSlider`].
+    default: option<f32>,
+    /// The message produced when the [`VerticalSlider`] is released.
+    on-release: option<message-id>,
+    width: option<pixels>,
+    height: option<length>,
+    step: option<f32>,
+    shift-step: option<f32>,
+  }
+}
+
+interface element {
+  use shared.{element};
+  use text.{text};
+  use column.{column};
+  use row.{row};
+  use container.{container};
+  use tooltip.{tooltip};
+  use button.{button};
+  use rule.{rule};
+  use checkbox.{checkbox};
+  use combo-box.{combo-box};
+  use float.{float};
+  use grid.{grid};
+  use progress-bar.{progress-bar};
+  use toggler.{toggler};
+  use radio.{radio};
+  use image.{image};
+  use keyed.{keyed-column};
+  use markdown.{markdown};
+  use pane-grid.{pane-grid};
+  use pick-list.{pick-list};
+  use slider.{slider};
+  use vertical-slider.{vertical-slider};
+  use svg.{svg};
+  use table.{table};
+  use text-input.{text-input};
+  use space.{space};
+  use scrollable.{scrollable};
+  use shared.{color};
+
+  explain: func(element: element, color: color) -> element;
+
+  text-to-element: func(text: text) -> element;
+
+  column-to-element: func(column: column) -> element;
+
+  button-to-element: func(button: button) -> element;
+
+  row-to-element: func(row: row) -> element;
+
+  container-to-element: func(container: container) -> element;
+
+  tooltip-to-element: func(tooltip: tooltip) -> element;
+
+  rule-to-element: func(rule: rule) -> element;
+
+  checkbox-to-element: func(checkbox: checkbox) -> element;
+
+  combo-box-to-element: func(combo-box: combo-box) -> element;
+
+  float-to-element: func(float: float) -> element;
+
+  grid-to-element: func(grid: grid) -> element;
+
+  progress-bar-to-element: func(progress-bar: progress-bar) -> element;
+
+  toggler-to-element: func(toggler: toggler) -> element;
+
+  radio-to-element: func(radio: radio) -> element;
+
+  image-to-element: func(image: image) -> element;
+
+  keyed-column-to-element: func(keyed-column: keyed-column) -> element;
+
+  markdown-to-element: func(markdown: markdown) -> element;
+
+  pane-grid-to-element: func(pane-grid: pane-grid) -> element;
+
+  pick-list-to-element: func(pick-list: pick-list) -> element;
+
+  slider-to-element: func(slider: slider) -> element;
+
+  vertical-slider-to-element: func(vertical-slider: vertical-slider) -> element;
+
+  svg-to-element: func(svg: svg) -> element;
+
+  table-to-element: func(table: table) -> element;
+
+  /// text-editor-to-element: func(text-editor: text-editor) -> element;
+  text-input-to-element: func(text-input: text-input) -> element;
+
+  space-to-element: func(space: space) -> element;
+
+  scrollable-to-element: func(scrollable: scrollable) -> element;
+}
+
+world app {
+  import shared;
+  import length;
+  import alignment;
+  import text;
+  import padding;
+  import column;
+  import row;
+  import container;
+  import tooltip;
+  import message-types;
+  import message;
+  import button;
+  import rule;
+  import checkbox;
+  import combo-box;
+  import float;
+  import grid;
+  import progress-bar;
+  import toggler;
+  import radio;
+  import image;
+  import keyed;
+  import markdown;
+  import pane-grid;
+  import pick-list;
+  import slider;
+  import vertical-slider;
+  import svg;
+  import table;
+  import text-input;
+  import space;
+  import scrollable;
+  import element;
+  use shared.{element};
+  use message.{message-id, message};
+
+  export update: func(message-id: message-id, message: message);
+  /// Exported function for creating a view
+  export view: func() -> element;
+  export message;
+}
