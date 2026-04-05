@@ -1,0 +1,5 @@
+package recon:event-bus@0.1.0;
+
+world bus-world {
+    import bus;
+}

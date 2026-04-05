@@ -11,9 +11,10 @@ repository = "https://github.com/Night-Hunter-NF/recon"
 # Local crates
 recon = { path = "crates/recon" }
 recon_bus = { path = "crates/recon_bus" }
+recon_guest = { path = "crates/recon_guest" }
 
 # GUI
-iced = { version = "0.14.0-dev", features = ["tokio", "advanced", "image", "markdown", "svg"] }
+iced = { version = "0.14.0", features = ["tokio", "advanced", "image", "markdown", "svg"] }
 
 # Async
 tokio = { version = "1", features = ["sync", "rt", "macros"] }
@@ -29,10 +30,16 @@ serde_json = "1"
 tracing = "0.1"
 
 # Plugins
-igloo = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "712a6b4" }
-igloo_guest = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "712a6b4" }
+igloo = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "bf29b32" }
+igloo_guest = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "bf29b32" }
 
-[patch.crates-io]
-iced = { git = "https://github.com/iced-rs/iced.git", rev = "9d56b488cc08b7365fb1839ed47ef92f3ff0fa36" }
-iced_core = { git = "https://github.com/iced-rs/iced.git", rev = "9d56b488cc08b7365fb1839ed47ef92f3ff0fa36" }
-iced_widget = { git = "https://github.com/iced-rs/iced.git", rev = "9d56b488cc08b7365fb1839ed47ef92f3ff0fa36" }
+# Wasm runtime
+wasmtime = { version = "43.0.0", features = ["component-model-async"] }
+wasmtime-wasi = "43.0.0"
+
+# Wasm guest
+wit-bindgen = "0.55.0"
+
+# Error handling
+thiserror = "2"
+

@@ -1,6 +1,10 @@
 //! In-process async topic-based pub/sub event bus with wildcard matching.
 
 mod envelope;
+#[cfg(feature = "guest")]
+pub mod guest;
+#[cfg(feature = "host")]
+pub mod host;
 mod topic;
 mod trie;
 
@@ -170,6 +174,11 @@ impl Subscription {
     /// Read the current latest value without waiting.
     pub fn get(&self) -> Option<Envelope> {
         self.receiver.borrow().clone()
+    }
+
+    /// Clone the underlying watch receiver for use in async producers.
+    pub fn clone_receiver(&self) -> watch::Receiver<Option<Envelope>> {
+        self.receiver.clone()
     }
 }
 

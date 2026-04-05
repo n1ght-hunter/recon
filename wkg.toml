@@ -1,0 +1,2 @@
+[overrides]
+"recon:event-bus" = { path = "crates/recon_bus/wit" }

@@ -1,5 +1,7 @@
 #![windows_subsystem = "windows"]
 
+mod bindings;
+mod plugin_manager;
 pub(crate) mod utils;
 
 use iced::{
@@ -7,7 +9,8 @@ use iced::{
     widget::{center, text},
     window,
 };
-use igloo::plugin_manager::PluginManager;
+use plugin_manager::ReconPluginManager;
+use recon_bus::Bus;
 
 fn main() -> iced::Result {
     utils::attach();
@@ -20,7 +23,7 @@ fn main() -> iced::Result {
 
 struct Recon {
     main_window: window::Id,
-    plugins: PluginManager,
+    plugins: ReconPluginManager,
 }
 
 #[derive(Debug, Clone)]
@@ -37,12 +40,10 @@ impl Recon {
             ..Default::default()
         });
 
-        let mut plugins = PluginManager::new().expect("failed to create plugin manager");
+        let bus = Bus::new();
+        let mut plugins = ReconPluginManager::new(bus).expect("failed to create plugin manager");
         plugins
-            .add_plugin_from_file(
-                "test",
-                "target/wasm32-wasip2/release/test_plugin.wasm",
-            )
+            .add_plugin_from_file("test", "target/wasm32-wasip2/release/test_plugin.wasm")
             .expect("failed to load test plugin");
 
         (

@@ -11,3 +11,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 igloo_guest.workspace = true
+recon_guest.workspace = true

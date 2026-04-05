@@ -1,0 +1,23 @@
+package recon:event-bus@0.1.0;
+
+interface bus {
+    record event-message {
+        topic: string,
+        payload: string,
+    }
+
+    /// Publish a payload to a topic. Returns subscriber count.
+    publish: func(topic: string, payload: string) -> result<u64, string>;
+
+    /// Subscribe to a topic pattern. Returns a stream of messages.
+    ///
+    /// This is `async` because wasmtime's bindgen only provides store access
+    /// (via `Accessor`) for async functions. Creating a `StreamReader` requires
+    /// store access, which sync `func_wrap` doesn't expose to the `Host` trait.
+    ///
+    /// See wasmtime-internal-wit-bindgen `config.rs` lines 77-88: only
+    /// `AsyncFreestanding` gets the `STORE` flag that triggers
+    /// `func_wrap_concurrent` with `Accessor<T>`.
+    /// Ref: https://github.com/bytecodealliance/wasmtime/blob/v43.0.0/crates/wit-bindgen/src/config.rs#L77-L88
+    subscribe: async func(filter: string) -> result<stream<event-message>, string>;
+}

@@ -8,9 +8,14 @@ description = "In-process async topic-based pub/sub event bus with wildcard matc
 
 [features]
 serde = ["dep:serde", "dep:serde_json"]
+host = ["dep:wasmtime", "dep:wasmtime-wasi", "tokio/rt"]
+guest = ["dep:wit-bindgen"]
 
 [dependencies]
 tokio.workspace = true
 dashmap.workspace = true
 serde = { workspace = true, optional = true }
 serde_json = { workspace = true, optional = true }
+wasmtime = { workspace = true, optional = true }
+wasmtime-wasi = { workspace = true, optional = true }
+wit-bindgen = { workspace = true, optional = true }

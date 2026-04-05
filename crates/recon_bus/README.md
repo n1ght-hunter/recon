@@ -55,6 +55,24 @@ let envelope = sub.recv().await.unwrap();
 let state: GameState = envelope.deserialize().unwrap();
 ```
 
+### Wasmtime host bindings
+
+```toml
+[dependencies]
+recon_bus = { workspace = true, features = ["host"] }
+```
+
+Provides `EventBus`, `EventBusView`, and `SubscriptionProducer` for exposing the event bus to WASM plugins via the `recon:event-bus/bus` WIT interface. See `crates/recon_bus/src/host.rs` for the wasmtime-wasi-style marker type pattern.
+
+### WASM guest bindings
+
+```toml
+[dependencies]
+recon_bus = { workspace = true, features = ["guest"] }
+```
+
+Provides `publish()` and `subscribe()` for calling the event bus from inside a WASM plugin.
+
 ## Topic Matching
 
 | Filter | Topic | Match? |

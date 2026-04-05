@@ -2,6 +2,7 @@ use igloo_guest::{
     Element,
     widgets::{button, column, container, text},
 };
+use recon_guest::bus;
 
 #[allow(missing_debug_implementations)]
 pub struct TestPlugin {
@@ -32,8 +33,14 @@ impl igloo_guest::Application<TestPlugin, Message> for TestPlugin {
 
     fn update(&mut self, message: Message) {
         match message {
-            Message::Increment => self.count += 1,
-            Message::Decrement => self.count -= 1,
+            Message::Increment => {
+                self.count += 1;
+                let _ = bus::publish("test/count", &self.count.to_string());
+            }
+            Message::Decrement => {
+                self.count -= 1;
+                let _ = bus::publish("test/count", &self.count.to_string());
+            }
         }
     }
 }

@@ -1,0 +1,21 @@
+package recon:event-bus@0.1.0;
+
+interface bus {
+  record event-message {
+    topic: string,
+    payload: string,
+  }
+
+  /// Publish a string payload to a topic.
+  publish: func(topic: string, payload: string) -> result<u64, string>;
+
+  /// Subscribe to a topic pattern.
+  subscribe: func(filter: string) -> result<u64, string>;
+
+  /// Poll the latest value for a subscription.
+  poll: func(subscription-id: u64) -> option<event-message>;
+
+  /// Unsubscribe and release the subscription.
+  unsubscribe: func(subscription-id: u64);
+}
+
