@@ -38,7 +38,7 @@ wasmtime = { version = "43.0.0", features = ["component-model-async"] }
 wasmtime-wasi = "43.0.0"
 
 # Wasm guest
-wit-bindgen = "0.55.0"
+wit-bindgen = "0.56.0"
 
 # Error handling
 thiserror = "2"
