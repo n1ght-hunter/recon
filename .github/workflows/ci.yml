@@ -22,7 +22,7 @@ jobs:
         run: rustup show
       - uses: ./.github/actions/install-wild
       - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
       - name: Run tests
         run: cargo test --workspace
 
@@ -36,7 +36,7 @@ jobs:
         run: rustup show
       - uses: ./.github/actions/install-wild
       - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
       - name: Clippy check
         run: cargo clippy --all-targets --workspace -- -D warnings
 
@@ -76,7 +76,7 @@ jobs:
         run: rustup show
       - uses: ./.github/actions/install-wild
       - name: Setup sccache
-        uses: mozilla-actions/sccache-action@v0.0.9
+        uses: mozilla-actions/sccache-action@v0.0.10
       - name: Check documentation
         run: RUSTDOCFLAGS="-D warnings" cargo doc --no-deps --document-private-items --workspace
 
