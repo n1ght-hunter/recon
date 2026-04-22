@@ -34,11 +34,11 @@ igloo = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "bf29b32" }
 igloo_guest = { git = "https://github.com/n1ght-hunter/igloo.git", rev = "bf29b32" }
 
 # Wasm runtime
-wasmtime = { version = "43.0.0", features = ["component-model-async"] }
-wasmtime-wasi = "43.0.0"
+wasmtime = { version = "44.0.0", features = ["component-model-async"] }
+wasmtime-wasi = "44.0.0"
 
 # Wasm guest
-wit-bindgen = "0.55.0"
+wit-bindgen = "0.57.1"
 
 # Error handling
 thiserror = "2"
